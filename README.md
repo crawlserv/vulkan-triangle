@@ -1,5 +1,5 @@
 # vulkan-triangle
-A simple implementation of https://github.com/Overv/VulkanTutorial/blob/master/code/18_vertex_buffer.cpp of https://vulkan-tutorial.com/in my own coding style and with many more classes.
+An implementation of [the vertex buffer example](https://github.com/Overv/VulkanTutorial/blob/master/code/18_vertex_buffer.cpp) from [vulkan-tutorial.com](https://vulkan-tutorial.com/) in my own coding style and with many more classes.
 
 ## Building vulkan-triangle on Linux
 

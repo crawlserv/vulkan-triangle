@@ -106,7 +106,7 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 				<< "\n(started in " << this->timer.since() << "ms)"
 				<< std::endl;
 
-	// create Vulkan API-specific synchronoization objects (to be wrapped)
+	// create Vulkan API-specific synchronization objects (to be wrapped)
 	this->vulkanCreateSyncObjects();
 }
 

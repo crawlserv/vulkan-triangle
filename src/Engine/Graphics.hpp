@@ -26,8 +26,6 @@
 #include "../Struct/VulkanSwapChainSupport.hpp"
 #include "../Wrapper/VulkanCommandBuffers.hpp"
 #include "../Wrapper/VulkanCommandPool.hpp"
-#include "../Wrapper/VulkanDebug.hpp"
-#include "../Wrapper/VulkanDebugInfo.hpp"
 #include "../Wrapper/VulkanDevice.hpp"
 #include "../Wrapper/VulkanDeviceMemory.hpp"
 #include "../Wrapper/VulkanDeviceWaitIdle.hpp"
@@ -45,6 +43,11 @@
 
 #ifndef GLFW_INCLUDE_VULKAN
 #error "Please compile with GLFW_INCLUDE_VULKAN to include the Vulkan API when using GLFW."
+#endif
+
+#ifndef NDEBUG
+	#include "../Wrapper/VulkanDebug.hpp"
+	#include "../Wrapper/VulkanDebugInfo.hpp"
 #endif
 
 #include <GLFW/glfw3.h>	// includes the Vulkan API, too (-DGLFW_INCLUDE_VULKAN required!)
@@ -102,9 +105,6 @@ namespace spacelite::Engine {
 		// Vulkan API-specific functions
 		void vulkanDrawFrame();
 		void vulkanRecreateSwapChain();
-
-		// Vulkan API-specific creation function (to be wrapped)
-		void vulkanCreateSyncObjects();
 
 		// Vulkan API-related wrappers
 		Wrapper::VulkanDebugInfo vulkanDebugInfo;

@@ -50,7 +50,9 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 					vulkanDebugInfo
 #endif
 			),
+#ifndef NDEBUG
 			vulkanDebug(vulkanInstance, vulkanDebugInfo),
+#endif
 			vulkanSurface(vulkanInstance, targetWindow),
 			vulkanPhysicalDevice(vulkanInstance, vulkanSurface, Graphics::vulkanRequirements.deviceExtensions),
 			vulkanDevice(vulkanPhysicalDevice, Graphics::vulkanRequirements),
@@ -102,8 +104,12 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 				<< VK_VERSION_MINOR(Graphics::engineInfo.vulkanVersion)
 				<< "\n";
 
-	// create Vulkan API-specific synchronoization objects (to be wrapped)
-	this->vulkanCreateSyncObjects();
+	// create Vulkan API-specific synchronization objects (to be wrapped)
+	for(unsigned short n = 0; n < this->vulkanSwapChain.getInFlightMax(); ++n) {
+		this->vulkanImageAvailableSemaphores.emplace_back(this->vulkanDevice);
+		this->vulkanRenderFinishedSemaphores.emplace_back(this->vulkanDevice);
+		this->vulkanInFlightFences.emplace_back(this->vulkanDevice);
+	}
 
 	std::cout	<< "(started in " << (double) this->timer.since() / 1000 << "ms)"
 				<< std::endl;
@@ -251,15 +257,6 @@ void Graphics::vulkanRecreateSwapChain() {
 	this->vulkanPipeline.create();
 	this->vulkanFrameBuffers.create();
 	this->vulkanCommandBuffers.create();
-}
-
-// create semaphores for the Vulkan API
-void Graphics::vulkanCreateSyncObjects() {
-	for(unsigned short n = 0; n < this->vulkanSwapChain.getInFlightMax(); ++n) {
-		this->vulkanImageAvailableSemaphores.emplace_back(this->vulkanDevice);
-		this->vulkanRenderFinishedSemaphores.emplace_back(this->vulkanDevice);
-		this->vulkanInFlightFences.emplace_back(this->vulkanDevice);
-	}
 }
 
 } /* namespace spacelite::Engine */

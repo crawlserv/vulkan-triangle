@@ -87,6 +87,24 @@ namespace spacelite::Wrapper {
 		return this->instance;
 	}
 
+	// move constructor
+	inline VulkanSurface::VulkanSurface(VulkanSurface&& other) noexcept
+			: parent(other.parent), instance(other.instance) {
+		other.instance = VK_NULL_HANDLE;
+	}
+
+	// move assignment
+	inline VulkanSurface& VulkanSurface::operator=(VulkanSurface&& other) noexcept {
+		this->instance = other.instance;
+
+		other.instance = VK_NULL_HANDLE;
+
+		using std::swap;
+
+		swap(this->parent, other.parent);
+
+		return *this;
+	}
 }
 
 #endif /* SRC_WRAPPER_VULKANSURFACE_HPP_ */

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 # set project name
-set( PROJECT_NAME "vulkan-triangle" )
+set(PROJECT_NAME "vulkan-triangle")
 project(${PROJECT_NAME})
 
 # show source directory
@@ -28,11 +28,11 @@ endif()
 # find GLFW
 find_package(glfw3 REQUIRED)
 
-if(${glfw3_FOUND})
-	message("Found GLFW v${glfw3_VERSION}.")
-else()
-	message(WARNING "GLFW >= v3.0 not found.")
-endif()
+	if(${glfw3_FOUND})
+		message("Found GLFW v${glfw3_VERSION}.")
+	else()
+		message(WARNING "GLFW >= v3.0 not found.")
+	endif()
 
 # specify source files
 add_executable(	${PROJECT_NAME}

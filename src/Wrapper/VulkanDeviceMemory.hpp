@@ -10,7 +10,6 @@
 #ifndef SRC_WRAPPER_VULKANDEVICEMEMORY_HPP_
 #define SRC_WRAPPER_VULKANDEVICEMEMORY_HPP_
 
-#include "VulkanBuffer.hpp"
 #include "VulkanDevice.hpp"
 #include "VulkanError.hpp"
 
@@ -28,17 +27,15 @@ namespace spacelite::Wrapper {
 	 */
 	class VulkanDeviceMemory {
 	public:
-		VulkanDeviceMemory(VulkanDevice& device, unsigned long size, unsigned int typeIndex);
-		VulkanDeviceMemory(VulkanDevice& device, const VulkanBuffer& buffer);
-		VulkanDeviceMemory(VulkanDevice& device, const VulkanBuffer& buffer, unsigned long size, const void * in);
+		VulkanDeviceMemory(VulkanDevice& device);
 		virtual ~VulkanDeviceMemory();
+
+		// allocator
+		void allocate(unsigned long size, unsigned int typeIndex);
 
 		// getters
 		VkDeviceMemory& get();
 		const VkDeviceMemory& get() const;
-
-		// writer
-		void write(const VulkanBuffer& buffer, unsigned long size, const void * in);
 
 		// not copyable, only moveable
 		VulkanDeviceMemory(const VulkanDeviceMemory&) = delete;
@@ -57,12 +54,11 @@ namespace spacelite::Wrapper {
 	 * IMPLEMENTATION
 	 */
 
-	// constructor (1): allocate device memory
-	inline VulkanDeviceMemory::VulkanDeviceMemory(
-			VulkanDevice& device,
-			unsigned long size,
-			unsigned int typeIndex
-	) : parent(device), instance(VK_NULL_HANDLE) {
+	// constructor: save device instance
+	inline VulkanDeviceMemory::VulkanDeviceMemory(VulkanDevice& device) : parent(device), instance(VK_NULL_HANDLE) {}
+
+	// allocate memory
+	inline void VulkanDeviceMemory::allocate(unsigned long size, unsigned int typeIndex) {
 		VkMemoryAllocateInfo vulkanAllocInfo = {};
 
 		vulkanAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -80,23 +76,7 @@ namespace spacelite::Wrapper {
 			throw Exception("Could not allocate memory for vertex buffer: " + Wrapper::VulkanError(vulkanResult).str());
 	}
 
-	// constructor (2): allocate device memory for buffer
-	inline VulkanDeviceMemory::VulkanDeviceMemory(
-			VulkanDevice& device,
-			const VulkanBuffer& buffer
-	) : VulkanDeviceMemory(device, buffer.getRequiredSize(), buffer.getRequiredTypeIndex()) {}
-
-	// constructor (3): allocate device memory for buffer and instantly write into it
-	inline VulkanDeviceMemory::VulkanDeviceMemory(
-			VulkanDevice& device,
-			const VulkanBuffer& buffer,
-			unsigned long size,
-			const void * in
-	) : VulkanDeviceMemory(device, buffer) {
-		this->write(buffer, size, in);
-	}
-
-	// destructor: free allocated memory
+	// destructor: free allocated memory if necessary
 	inline VulkanDeviceMemory::~VulkanDeviceMemory() {
 		if(this->instance)
 			vkFreeMemory(this->parent.get(), this->instance, Helper::VulkanAllocator::ptr);
@@ -110,20 +90,6 @@ namespace spacelite::Wrapper {
 	// get const reference to the instance of the device memory
 	inline const VkDeviceMemory& VulkanDeviceMemory::get() const {
 		return this->instance;
-	}
-
-	// write to buffer
-	inline void VulkanDeviceMemory::write(const VulkanBuffer& buffer, unsigned long size, const void * in) {
-		vkBindBufferMemory(this->parent.get(), buffer.get(), this->instance, 0);
-
-		// map GPU memory into CPU accessible memory
-		void * data = nullptr;
-
-		vkMapMemory(this->parent.get(), this->instance, 0, size, 0, &data);
-
-		std::memcpy(data, in, (size_t) size);
-
-		vkUnmapMemory(this->parent.get(), this->instance);
 	}
 
 	// move constructor

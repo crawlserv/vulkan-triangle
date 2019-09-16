@@ -13,11 +13,11 @@ namespace spacelite::Engine {
 
 /* STATIC CONSTANTS */
 const Struct::EngineInfo Graphics::engineInfo(
-		SPACELITE_NAME,
-		SPACELITE_VERSION_MAJOR,
-		SPACELITE_VERSION_MINOR,
-		SPACELITE_VERSION_PATCH,
-		SPACELITE_VULKAN_VERSION
+		ENGINE_NAME,
+		ENGINE_VERSION_MAJOR,
+		ENGINE_VERSION_MINOR,
+		ENGINE_VERSION_PATCH,
+		ENGINE_VULKAN_VERSION
 );
 const Struct::VulkanRequirements Graphics::vulkanRequirements(
 		{ "VK_LAYER_KHRONOS_validation" },
@@ -38,7 +38,9 @@ const Struct::ShaderFiles Graphics::shaderFiles = {
 
 // constructor: create objects and show header with application and engine
 Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
-		:	targetWindow(window),
+		:	counter(0),
+			speed(0.),
+			targetWindow(window),
 			vulkanInstance(
 					appInfo,
 					Graphics::engineInfo
@@ -60,13 +62,8 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 			vulkanVertexBuffer(
 					vulkanDevice,
 					vulkanPhysicalDevice,
+					true,
 					sizeof(Graphics::vertices[0]) * Graphics::vertices.size(),
-					true
-			),
-			vulkanVertexBufferMemory(
-					vulkanDevice,
-					vulkanVertexBuffer,
-					vulkanVertexBuffer.getMaxContentSize(),
 					Graphics::vertices.data()
 			),
 			vulkanCommandBuffers(
@@ -103,15 +100,24 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 				<< VK_VERSION_MAJOR(Graphics::engineInfo.vulkanVersion)
 				<< "."
 				<< VK_VERSION_MINOR(Graphics::engineInfo.vulkanVersion)
-				<< "\n(started in " << this->timer.since() << "ms)"
+				<< "\n";
+
+	// create Vulkan API-specific synchronoization objects (to be wrapped)
+	this->vulkanCreateSyncObjects();
+
+	std::cout	<< "(started in " << (double) this->timer.since() / 1000 << "ms)"
 				<< std::endl;
 
-	// create Vulkan API-specific synchronization objects (to be wrapped)
-	this->vulkanCreateSyncObjects();
+	this->timer.reset();
 }
 
 // destructor: show memory debugging stats (if necessary)
 Graphics::~Graphics() {
+	std::cout	<< "(average speed was "
+				<< this->speed
+				<< "tps)"
+				<< std::endl;
+
 #ifndef NDEBUG
 	std::cout	<< "(allocated "
 				<< Helper::VulkanAllocator::getAllocated()
@@ -124,6 +130,14 @@ Graphics::~Graphics() {
 
 // tick: draw a frame
 void Graphics::tick() {
+	const double elapsedTime = (double) this->timer.since() / 1000;
+
+	timer.reset();
+
+	this->speed = (this->counter * this->speed + 1000 / elapsedTime) / (this->counter + 1);
+
+	++(this->counter);
+
 	this->vulkanDrawFrame();
 }
 

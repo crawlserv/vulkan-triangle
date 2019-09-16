@@ -22,8 +22,9 @@ namespace spacelite::Wrapper {
 		VulkanVertexBuffer(
 				VulkanDevice& device,
 				const VulkanPhysicalDevice& physicalDevice,
+				bool isExclusive,
 				unsigned long size,
-				bool isExclusive
+				const void * in
 		);
 	};
 
@@ -35,8 +36,9 @@ namespace spacelite::Wrapper {
 	inline VulkanVertexBuffer::VulkanVertexBuffer(
 			VulkanDevice& device,
 			const VulkanPhysicalDevice& physicalDevice,
+			bool isExclusive,
 			unsigned long size,
-			bool isExclusive
+			const void * in
 	) : VulkanBuffer(
 			device,
 			physicalDevice,
@@ -44,7 +46,9 @@ namespace spacelite::Wrapper {
 			isExclusive,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-	) {}
+	) {
+		this->fill(in);
+	}
 
 } /* spacelite::Wrapper */
 

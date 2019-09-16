@@ -13,6 +13,7 @@
 #define SRC_WRAPPER_VULKANBUFFER_HPP_
 
 #include "VulkanDevice.hpp"
+#include "VulkanDeviceMemory.hpp"
 #include "VulkanError.hpp"
 #include "VulkanPhysicalDevice.hpp"
 
@@ -21,7 +22,7 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <utility>		// std::swap
+#include <utility>		// std::move, std::swap
 
 namespace spacelite::Wrapper {
 
@@ -43,9 +44,10 @@ namespace spacelite::Wrapper {
 		// getters
 		VkBuffer& get();
 		const VkBuffer& get() const;
-		unsigned long getRequiredSize() const;
-		unsigned int getRequiredTypeIndex() const;
-		unsigned long getMaxContentSize() const;
+
+		// writers
+		void fill(const void * in);
+		void write(unsigned long offset, unsigned long size, const void * in);
 
 		// not copyable, only moveable
 		VulkanBuffer(const VulkanBuffer&) = delete;
@@ -56,9 +58,8 @@ namespace spacelite::Wrapper {
 	private:
 		VulkanDevice& parent;
 		VkBuffer instance;
+		VulkanDeviceMemory memory;
 
-		unsigned long requiredSize;
-		unsigned int requiredTypeIndex;
 		unsigned long maxContentSize;
 
 		MAIN_EXCEPTION_CLASS();
@@ -74,7 +75,7 @@ namespace spacelite::Wrapper {
 			bool isExclusive,
 			VkBufferUsageFlags usageFlags,
 			VkMemoryPropertyFlags memoryFlags
-	) : parent(device), instance(VK_NULL_HANDLE), requiredSize(0), requiredTypeIndex(0), maxContentSize(size) {
+	) :	parent(device), instance(VK_NULL_HANDLE), memory(parent), maxContentSize(size) {
 		// create buffer
 		VkBufferCreateInfo vulkanBufferInfo = {};
 
@@ -102,8 +103,13 @@ namespace spacelite::Wrapper {
 				&memRequirements
 		);
 
-		this->requiredSize = memRequirements.size;
-		this->requiredTypeIndex = physicalDevice.findMemoryType(memRequirements.memoryTypeBits, memoryFlags);
+		this->memory.allocate(
+				memRequirements.size,
+				physicalDevice.findMemoryType(memRequirements.memoryTypeBits, memoryFlags)
+		);
+
+		// bind memory to buffer
+		vkBindBufferMemory(this->parent.get(), this->instance, this->memory.get(), 0);
 	}
 
 	inline VulkanBuffer::~VulkanBuffer() {
@@ -121,27 +127,27 @@ namespace spacelite::Wrapper {
 		return this->instance;
 	}
 
-	// get the required memory size for the buffer in bytes
-	inline unsigned long VulkanBuffer::getRequiredSize() const {
-		return this->requiredSize;
+	// fill the whole buffer
+	inline void VulkanBuffer::fill(const void * in) {
+		this->write(0, this->maxContentSize, in);
 	}
 
-	// get the index of the required memory type for the buffer
-	inline unsigned int VulkanBuffer::getRequiredTypeIndex() const {
-		return this->requiredTypeIndex;
-	}
+	// write into the buffer
+	inline void VulkanBuffer::write(unsigned long offset, unsigned long size, const void * in) {
+		void * data;
 
-	// get the maximum size of the buffer content in bytes
-	inline unsigned long VulkanBuffer::getMaxContentSize() const {
-		return this->maxContentSize;
+		vkMapMemory(this->parent.get(), this->memory.get(), offset, size, 0, &data);
+
+		memcpy(data, in, size);
+
+		vkUnmapMemory(this->parent.get(), this->memory.get());
 	}
 
 	// move constructor
 	inline VulkanBuffer::VulkanBuffer(VulkanBuffer&& other) noexcept
 			:	parent(other.parent),
 				instance(other.instance),
-				requiredSize(other.requiredSize),
-				requiredTypeIndex(other.requiredTypeIndex),
+				memory(std::move(other.memory)),
 				maxContentSize(other.maxContentSize) {
 		other.instance = VK_NULL_HANDLE;
 	}
@@ -149,8 +155,6 @@ namespace spacelite::Wrapper {
 	// move assignment
 	inline VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& other) noexcept {
 		this->instance = other.instance;
-		this->requiredSize = other.requiredSize;
-		this->requiredTypeIndex = other.requiredTypeIndex;
 		this->maxContentSize = other.maxContentSize;
 
 		other.instance = VK_NULL_HANDLE;
@@ -158,6 +162,7 @@ namespace spacelite::Wrapper {
 		using std::swap;
 
 		swap(this->parent, other.parent);
+		swap(this->memory, other.memory);
 
 		return *this;
 	}

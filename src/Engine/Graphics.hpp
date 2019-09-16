@@ -13,7 +13,7 @@
 #include "Version.hpp"
 
 #include "../Helper/File.hpp"
-#include "../Helper/Timer.hpp"
+#include "../Helper/TimerHighRes.hpp"
 #include "../Helper/VulkanAllocator.hpp"
 #include "../Main/Exception.hpp"
 #include "../Main/Window.hpp"
@@ -91,8 +91,10 @@ namespace spacelite::Engine {
 		Graphics& operator=(Graphics&&) = delete;
 
 	private:
-		// timer (needs to be constructed first)
-		Helper::Timer timer;
+		// timer (needs to be constructed first), counter and speed
+		Helper::TimerHighRes timer;
+		unsigned long long counter;
+		double speed; // speed in average ticks per second
 
 		// reference to target window
 		Main::Window& targetWindow;
@@ -117,7 +119,6 @@ namespace spacelite::Engine {
 		Wrapper::VulkanFrameBuffers vulkanFrameBuffers;
 		Wrapper::VulkanCommandPool vulkanCommandPool;
 		Wrapper::VulkanVertexBuffer vulkanVertexBuffer;
-		Wrapper::VulkanDeviceMemory vulkanVertexBufferMemory;
 		Wrapper::VulkanCommandBuffers vulkanCommandBuffers;
 		std::vector<Wrapper::VulkanSemaphore> vulkanImageAvailableSemaphores;
 		std::vector<Wrapper::VulkanSemaphore> vulkanRenderFinishedSemaphores;

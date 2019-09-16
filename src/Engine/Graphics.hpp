@@ -107,9 +107,13 @@ namespace spacelite::Engine {
 		void vulkanRecreateSwapChain();
 
 		// Vulkan API-related wrappers
+#ifndef NDEBUG
 		Wrapper::VulkanDebugInfo vulkanDebugInfo;
+#endif
 		Wrapper::VulkanInstance vulkanInstance;
+#ifndef NDEBUG
 		Wrapper::VulkanDebug vulkanDebug;
+#endif
 		Wrapper::VulkanSurface vulkanSurface;
 		Wrapper::VulkanPhysicalDevice vulkanPhysicalDevice;
 		Wrapper::VulkanDevice vulkanDevice;

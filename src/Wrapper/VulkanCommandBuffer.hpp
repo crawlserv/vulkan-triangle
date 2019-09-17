@@ -1,7 +1,7 @@
 /*
  * VulkanCommandBuffer.hpp
  *
- * Wrapping a command buffer for the Vulkan API.
+ * Wraps a command buffer for the Vulkan API.
  *
  * Contains only a reference to an already allocated instance (because instances are allocated en bloc).
  *
@@ -40,6 +40,7 @@ namespace spacelite::Wrapper {
 				VulkanVertexBuffer& vertexBuffer,
 				unsigned long numberOfVertices
 		);
+		virtual ~VulkanCommandBuffer();
 
 		// getters
 		VkCommandBuffer& get();
@@ -52,7 +53,7 @@ namespace spacelite::Wrapper {
 		VulkanCommandBuffer& operator=(VulkanCommandBuffer&& other) noexcept;
 
 	private:
-		VkCommandBuffer& instance;
+		VkCommandBuffer& reference;
 
 		MAIN_EXCEPTION_CLASS();
 	};
@@ -60,6 +61,8 @@ namespace spacelite::Wrapper {
 	/*
 	 * IMPLEMENTATION
 	 */
+	
+	// constructor: setup command buffer
 	inline VulkanCommandBuffer::VulkanCommandBuffer(
 			VkCommandBuffer& dataRef,
 			VulkanRenderPass& renderPass,
@@ -68,14 +71,14 @@ namespace spacelite::Wrapper {
 			VulkanPipeline& pipeline,
 			VulkanVertexBuffer& vertexBuffer,
 			unsigned long numberOfVertices
-	) : instance(dataRef) {
+	) : reference(dataRef) {
 		VkCommandBufferBeginInfo beginInfo = {};
 
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		beginInfo.flags = 0;
 		beginInfo.pInheritanceInfo = nullptr;
 
-		VkResult vulkanResult = vkBeginCommandBuffer(this->instance, &beginInfo);
+		VkResult vulkanResult = vkBeginCommandBuffer(this->reference, &beginInfo);
 
 		if(vulkanResult != VK_SUCCESS)
 			throw Exception("Could not begin command buffer: " + Wrapper::VulkanError(vulkanResult).str());
@@ -94,53 +97,56 @@ namespace spacelite::Wrapper {
 		renderPassInfo.clearValueCount = 1;
 		renderPassInfo.pClearValues = &clearColor;
 
-		vkCmdBeginRenderPass(this->instance, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBeginRenderPass(this->reference, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		{
 			// bind graphics pipeline
-			vkCmdBindPipeline(this->instance, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.get());
+			vkCmdBindPipeline(this->reference, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.get());
 
 			// bind vertex buffer
 			VkBuffer vulkanVertexBuffers[] = { vertexBuffer.get() };
 			VkDeviceSize vulkanOffsets[] = { 0 };
 
-			vkCmdBindVertexBuffers(this->instance, 0, 1, vulkanVertexBuffers, vulkanOffsets);
+			vkCmdBindVertexBuffers(this->reference, 0, 1, vulkanVertexBuffers, vulkanOffsets);
 
 			// draw vertices
-			vkCmdDraw(this->instance, static_cast<unsigned int>(numberOfVertices), 1, 0, 0);
+			vkCmdDraw(this->reference, static_cast<unsigned int>(numberOfVertices), 1, 0, 0);
 		}
 
 		// finish render pass
-		vkCmdEndRenderPass(this->instance);
+		vkCmdEndRenderPass(this->reference);
 
 		// finish command buffer
-		vulkanResult = vkEndCommandBuffer(this->instance);
+		vulkanResult = vkEndCommandBuffer(this->reference);
 
 		if(vulkanResult != VK_SUCCESS)
 			throw Exception("Could not finish command buffer: " + Wrapper::VulkanError(vulkanResult).str());
 	}
+	
+	// destructor stub
+	inline VulkanCommandBuffer::~VulkanCommandBuffer() {}
 
 	// get reference to the instance of the command buffer
 	inline VkCommandBuffer& VulkanCommandBuffer::get() {
-		return this->instance;
+		return this->reference;
 	}
 
 	// get const reference to the instance of the command buffer
 	inline const VkCommandBuffer& VulkanCommandBuffer::get() const {
-		return this->instance;
+		return this->reference;
 	}
 
 	// move constructor
 	inline VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandBuffer&& other) noexcept
-			:	instance(other.instance) {
-		other.instance = VK_NULL_HANDLE;
+			:	reference(other.reference) {
+		other.reference = VK_NULL_HANDLE;
 	}
 
 	// move assignment
 	inline VulkanCommandBuffer& VulkanCommandBuffer::operator=(VulkanCommandBuffer&& other) noexcept {
 		using std::swap;
 
-		swap(this->instance, other.instance);
+		swap(this->reference, other.reference);
 
 		return *this;
 	}

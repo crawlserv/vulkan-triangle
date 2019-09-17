@@ -64,6 +64,7 @@ Graphics::Graphics(const Struct::AppInfo& appInfo, Main::Window& window)
 			vulkanVertexBuffer(
 					vulkanDevice,
 					vulkanPhysicalDevice,
+					vulkanCommandPool,
 					true,
 					sizeof(Graphics::vertices[0]) * Graphics::vertices.size(),
 					Graphics::vertices.data()

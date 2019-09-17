@@ -45,6 +45,12 @@ namespace spacelite::Wrapper {
 		VkCommandBuffer& get();
 		const VkCommandBuffer& get() const;
 
+		// not copyable, only moveable
+		VulkanCommandBuffer(const VulkanCommandBuffer&) = delete;
+		VulkanCommandBuffer(VulkanCommandBuffer&& other) noexcept;
+		VulkanCommandBuffer& operator=(const VulkanCommandBuffer&) = delete;
+		VulkanCommandBuffer& operator=(VulkanCommandBuffer&& other) noexcept;
+
 	private:
 		VkCommandBuffer& instance;
 
@@ -122,6 +128,21 @@ namespace spacelite::Wrapper {
 	// get const reference to the instance of the command buffer
 	inline const VkCommandBuffer& VulkanCommandBuffer::get() const {
 		return this->instance;
+	}
+
+	// move constructor
+	inline VulkanCommandBuffer::VulkanCommandBuffer(VulkanCommandBuffer&& other) noexcept
+			:	instance(other.instance) {
+		other.instance = VK_NULL_HANDLE;
+	}
+
+	// move assignment
+	inline VulkanCommandBuffer& VulkanCommandBuffer::operator=(VulkanCommandBuffer&& other) noexcept {
+		using std::swap;
+
+		swap(this->instance, other.instance);
+
+		return *this;
 	}
 }
 

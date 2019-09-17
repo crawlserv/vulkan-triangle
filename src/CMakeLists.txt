@@ -28,11 +28,26 @@ endif()
 # find GLFW
 find_package(glfw3 REQUIRED)
 
-	if(${glfw3_FOUND})
-		message("Found GLFW v${glfw3_VERSION}.")
-	else()
-		message(WARNING "GLFW >= v3.0 not found.")
-	endif()
+if(${glfw3_FOUND})
+	message("Found GLFW v${glfw3_VERSION}.")
+else()
+	message(WARNING "GLFW >= v3.0 not found.")
+endif()
+
+# find GLM
+FIND_PACKAGE(GLM QUIET)
+FIND_PACKAGE(glm QUIET)
+
+if(${glm_FOUND})
+	set(GLM_FOUND ${glm_FOUND})
+	set(GLM_VERSION ${glm_VERSION})
+endif()
+
+if(${GLM_FOUND})
+	message("Found GLM v${GLM_VERSION}.")
+else()
+	message(WARNING "GLM not found.")
+endif()
 
 # specify source files
 add_executable(	${PROJECT_NAME}
@@ -49,6 +64,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # set include directories
 target_include_directories(${PROJECT_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIRS})
 
 # set libraries
 target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})

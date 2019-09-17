@@ -23,7 +23,7 @@ const Struct::VulkanRequirements Graphics::vulkanRequirements(
 		{ "VK_LAYER_KHRONOS_validation" },
 		{ VK_KHR_SWAPCHAIN_EXTENSION_NAME }
 );
-const unsigned int Graphics::maxFramesInFlight = 3;
+const unsigned int Graphics::maxFramesInFlight = 2;
 const std::vector<Struct::Vertex> Graphics::vertices = { // temporary (for testing)
 		{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
 		{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},

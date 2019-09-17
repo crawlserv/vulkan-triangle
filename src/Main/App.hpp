@@ -15,7 +15,7 @@
 
 #include "../Engine/Graphics.hpp"
 #include "../Struct/AppInfo.hpp"
-#include "../Wrapper/CLocale.hpp"
+#include "../Wrapper/SetLocale.hpp"
 
 #include <cstdlib>	// EXIT_FAILURE, EXIT_SUCCESS
 #include <iostream>	// std::cout, std::endl
@@ -50,7 +50,7 @@ namespace spacelite::Main {
 
 	private:
 		// using C locale for output to stdout
-		const Wrapper::CLocale cLocale;
+		const Wrapper::SetLocale locale;
 
 	protected:
 		// state

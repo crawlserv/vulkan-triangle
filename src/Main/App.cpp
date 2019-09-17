@@ -19,7 +19,8 @@ const unsigned int App::defaultWinHeight = 600;
 
 // constructor: initialize all components
 App::App(int argc __attribute__ ((unused)), char * argv[] __attribute__ ((unused)))
-		:	isRunning(true),
+		:	locale("en_US.UTF8"),
+			isRunning(true),
 			mainWindow(Struct::WinProp(App::appInfo.name, App::defaultWinWidth, App::defaultWinHeight)),
 			engineGraphics(Engine::Graphics::getInstance(App::appInfo, mainWindow)) {}
 

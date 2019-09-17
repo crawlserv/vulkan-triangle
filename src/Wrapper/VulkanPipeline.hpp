@@ -194,7 +194,7 @@ namespace spacelite::Wrapper {
 		vulkanMultisampling.alphaToCoverageEnable = VK_FALSE;
 		vulkanMultisampling.alphaToOneEnable = VK_FALSE;
 
-		// setup alpha blending
+		// setup alpha and color blending
 		VkPipelineColorBlendAttachmentState vulkanColorBlendAttachment = {};
 
 		vulkanColorBlendAttachment.colorWriteMask =
@@ -202,9 +202,14 @@ namespace spacelite::Wrapper {
 				| VK_COLOR_COMPONENT_G_BIT
 				| VK_COLOR_COMPONENT_B_BIT
 				| VK_COLOR_COMPONENT_A_BIT;
+/* to enable alpha blending:
 		vulkanColorBlendAttachment.blendEnable = VK_TRUE;
 		vulkanColorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		vulkanColorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+*/
+		vulkanColorBlendAttachment.blendEnable = VK_FALSE;
+		vulkanColorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+		vulkanColorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
 		vulkanColorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
 		vulkanColorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
 		vulkanColorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;

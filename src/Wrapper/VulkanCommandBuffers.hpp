@@ -107,8 +107,9 @@ namespace spacelite::Wrapper {
 		this->destroy();
 	}
 
-	// create the frame buffers
+	// create the command buffers
 	inline void VulkanCommandBuffers::create() {
+		// allocate command buffers
 		const unsigned int num = this->fBuffers.getNumberOfBuffers();
 
 		this->buffers.reserve(num);
@@ -128,7 +129,7 @@ namespace spacelite::Wrapper {
 		);
 
 		if(vulkanResult != VK_SUCCESS)
-			throw Exception("Could not create command buffer: " + Wrapper::VulkanError(vulkanResult).str());
+			throw Exception("Could not create command buffers: " + Wrapper::VulkanError(vulkanResult).str());
 
 		// fill command buffers
 		unsigned short n = 0;
@@ -150,7 +151,7 @@ namespace spacelite::Wrapper {
 		this->_created = true;
 	}
 
-	// destroy the frame buffers
+	// destroy the command buffers
 	inline void VulkanCommandBuffers::destroy() {
 		if(this->_created) {
 			this->buffers.clear();

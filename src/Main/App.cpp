@@ -12,7 +12,7 @@
 namespace spacelite::Main {
 
 /* STATIC CONSTANTS */
-const Struct::AppInfo App::appInfo("Spacelite Showcase", 1, 0, 0);
+const Struct::AppInfo App::appInfo("vulkan-triangle", 1, 0, 0);
 const unsigned int App::defaultWinWidth = 800;
 const unsigned int App::defaultWinHeight = 600;
 /* END STATIC CONSTANTS */

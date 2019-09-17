@@ -16,7 +16,8 @@ The following additional components are required to build crawlserv++ on your sy
 * [`gcc`](https://gcc.gnu.org/), version 6 or higher, or [`clang`](https://clang.llvm.org/), version 5 or higher – or any other modern C++ 17 compiler
 * a multi-threading library supported by `cmake` like `pthreads` (e.g. `libpthread-stubs0-dev` on Ubuntu)
 * the [`GLFW`](https://www.glfw.org/) library, version 3.0 or higher (tested with version 3.3)
-* the [`Vulkan API`](https://www.khronos.org/vulkan/) (tested with versions 1.0 and 1.1)
+* the [`Vulkan API`](https://www.khronos.org/vulkan/), version 1.1 or higher
+* the [`GLM`](https://glm.g-truc.net/) library (tested with version 0.9.9)
 
 After installing these components and cloning or downloading the source code, use the terminal to go into the `vulkan-triangle` directory with downloaded files and run the following commands:
 

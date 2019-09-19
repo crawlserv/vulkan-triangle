@@ -28,11 +28,11 @@ Window::Window(const Struct::WinProp& properties)
 	// create window
 	this->ptr = glfwCreateWindow(this->width, this->height, properties.title.c_str(), nullptr, nullptr);
 
-	glfwSetWindowUserPointer(this->ptr, this);
-	glfwSetFramebufferSizeCallback(this->ptr, this->resizeCallback);
-
 	if(!(this->ptr))
 		throw Exception("Could not create window: " + Wrapper::GlfwError().str());
+
+	glfwSetWindowUserPointer(this->ptr, this);
+	glfwSetFramebufferSizeCallback(this->ptr, this->resizeCallback);
 
 	glfwMakeContextCurrent(this->ptr);
 }

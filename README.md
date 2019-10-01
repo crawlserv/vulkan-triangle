@@ -19,7 +19,7 @@ The following additional components are required to build crawlserv++ on your sy
 * the [`Vulkan API`](https://www.khronos.org/vulkan/), version 1.1 or higher
 * the [`GLM`](https://glm.g-truc.net/) library (tested with version 0.9.9)
 
-After installing these components and cloning or downloading the source code, use the terminal to go into the `vulkan-triangle` directory with downloaded files and run the following commands:
+After installing these components and cloning or downloading the source code, use the terminal to go into the `vulkan-triangle` directory with the downloaded files and run the following commands:
 
 ```
 mkdir build 

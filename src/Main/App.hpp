@@ -14,6 +14,7 @@
 #include "Window.hpp"
 
 #include "../Engine/Graphics.hpp"
+#include "../Helper/SingletonDestructor.hpp"
 #include "../Struct/AppInfo.hpp"
 #include "../Wrapper/SetLocale.hpp"
 
@@ -58,6 +59,9 @@ namespace spacelite::Main {
 
 		// main window
 		Window mainWindow;
+
+		// engine destructor
+		Helper::SingletonDestructor<Engine::Graphics> graphicsDestructor;
 
 		// engine
 		Engine::Graphics& engineGraphics;

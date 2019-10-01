@@ -67,6 +67,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIRS})
 
 # set libraries
+message("Setting libraries: ${Vulkan_LIBRARIES} glfw.")
+
 target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} glfw)
 

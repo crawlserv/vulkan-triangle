@@ -13,6 +13,7 @@
 #include "Version.hpp"
 
 #include "../Helper/File.hpp"
+#include "../Helper/SingletonDestructor.hpp"
 #include "../Helper/TimerHighRes.hpp"
 #include "../Helper/VulkanAllocator.hpp"
 #include "../Main/Exception.hpp"
@@ -52,6 +53,7 @@
 
 #include <GLFW/glfw3.h>	// includes the Vulkan API, too (-DGLFW_INCLUDE_VULKAN required!)
 
+#include <cassert>	// assert
 #include <cstring>	// std::memcpy
 #include <iostream>	// std::cout, std::endl, std::flush
 #include <limits>	// std::numeric_limits
@@ -70,13 +72,51 @@ namespace spacelite::Engine {
 		static const Struct::ShaderFiles shaderFiles;
 		/* END STATIC CONSTANTS */
 
-		/* SINGLETON */
+		/* QUASI-SINGLETON W/ POINTER AND DESTRUCTOR */
 	public:
-		static Graphics& getInstance(const Struct::AppInfo& appInfo, Main::Window& window) {
-			static Graphics instance(appInfo, window);
+		static Graphics& getInstance(
+				const Struct::AppInfo& appInfo,
+				Main::Window& window,
+				Helper::SingletonDestructor<Graphics> * destructor = nullptr
+		) {
+			static class SingletonHolder {
+			public:
+				SingletonHolder(
+						const Struct::AppInfo& appInfo,
+						Main::Window& window,
+						Helper::SingletonDestructor<Graphics> * destructor
+				) : ptr(nullptr), destructionDelegated(false) {
+					this->ptr = new Graphics(appInfo, window);
 
-			return instance;
+					assert(this->ptr);
+
+					if(destructor) {
+						destructor->setPointer(this->ptr);
+
+						this->destructionDelegated = true;
+					}
+				}
+
+				~SingletonHolder() {
+					if(this->ptr && !(this->destructionDelegated))
+						delete this->ptr;
+				}
+
+				Graphics& get() {
+					assert(this->ptr);
+
+					return *(this->ptr);
+				}
+
+			private:
+				Graphics * ptr;
+
+				bool destructionDelegated;
+			} holder(appInfo, window, destructor);
+
+			return holder.get();
 		}
+
 		virtual ~Graphics();
 
 	private:

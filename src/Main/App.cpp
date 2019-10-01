@@ -22,7 +22,7 @@ App::App(int argc __attribute__ ((unused)), char * argv[] __attribute__ ((unused
 		:	locale("en_US.UTF8"),
 			isRunning(true),
 			mainWindow(Struct::WinProp(App::appInfo.name, App::defaultWinWidth, App::defaultWinHeight)),
-			engineGraphics(Engine::Graphics::getInstance(App::appInfo, mainWindow)) {}
+			engineGraphics(Engine::Graphics::getInstance(App::appInfo, mainWindow, &(this->graphicsDestructor))) {}
 
 // run the main loop
 int App::run() {
